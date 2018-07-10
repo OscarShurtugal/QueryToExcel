@@ -14,16 +14,11 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-
-            //string resultado = @"C:\Users\oscarsanchez2\Documents\Automation Anywhere Files\Automation Anywhere\My Tasks\ATT_PRODUCTIVO\IVRMarketing";
-            ///
+///
 
             //string path = AppDomain.CurrentDomain.BaseDirectory;
             //Console.WriteLine("PATH:    " + path);
 
-            //path = path.Before(@"LinqDemoFr\");
-
-            //path += @"\rutasConfigRobot.txt";
 
             //Console.WriteLine(path);
 
@@ -36,7 +31,6 @@ namespace ConsoleApp1
             //    //Console.WriteLine(item);
             //}
 
-            ////string pathToExcelFile = @"C:\Users\oscarsanchez2\Documents\AT_T\linq+sql\numerosPruebas.xlsx";
 
             //string pathToExcelFile = rutasDeEntrada[0];
 
@@ -89,7 +83,6 @@ namespace ConsoleApp1
 
 
 
-            //string pathToExcelFile = @"C:\Users\oscarsanchez2\Documents\Automation Anywhere Files\Automation Anywhere\My Tasks\ATT_PRODUCTIVO\IVRMarketing\Input\numerosPruebas.xlsx";
             string pathToExcelFile = lineas[0];
             
             
@@ -152,7 +145,7 @@ namespace ConsoleApp1
 
             //    try
             //    {
-            //        StreamWriter sw = new StreamWriter(@"C:\Users\oscarsanchez2\Documents\AT_T\linq+sql\numerosLunes.txt", false);
+            //        StreamWriter sw = new StreamWriter(@"C:\Users\numerosLunes.txt", false);
             //        foreach (var item in filteredQuery)
             //        {
             //            sw.WriteLine(item.MSISDN);
@@ -172,8 +165,8 @@ namespace ConsoleApp1
             //string diaSiguiente = DateTime.Today.AddDays(1).DayOfWeek.ToString();
 
             string appendedToFile = "";
-            
-            //string rutaPrincipalAlArchivo = @"C:\Users\oscarsanchez2\Documents\AT_T\linq+sql\";
+
+
             string rutaPrincipalAlArchivo = lineas[1];
          
 
