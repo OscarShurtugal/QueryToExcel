@@ -66,7 +66,7 @@ namespace ConsoleApp1
             string pathAArchivoRutas = pathALaIniciativa + @"Config\rutasConfigRobot.txt";
 
             Console.WriteLine("PATH A ARCHIVO RUTAS: " + pathAArchivoRutas);
-
+            
 
             string fichero = pathAArchivoRutas;
            
@@ -89,7 +89,9 @@ namespace ConsoleApp1
             
 
             var excel = new ExcelQueryFactory(pathToExcelFile);
-            var query1 = from a in excel.Worksheet<numerosIVRSms>() select a;
+            excel.AddMapping("MSISDN", "MSISDN");
+            excel.AddMapping("FECHA_ESTATUS", "FECHA_ESTATUS");
+            var query1 = from a in excel.Worksheet<numerosIVRSms>("Detalle") select a;
 
             //string fechaComparacion = DateTime.Today.AddDays(-25).ToShortDateString();
             string fechaComparacion = DateTime.Today.AddDays(-1).ToShortDateString();
