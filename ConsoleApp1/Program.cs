@@ -60,6 +60,7 @@ namespace ConsoleApp1
             string pathALaIniciativa = SubstringExtensions.Before(path1, "Config");
 
             
+
             Console.WriteLine("Path a la iniciativa:" + pathALaIniciativa);
 
             string pathAArchivoRutas = pathALaIniciativa + @"Config\rutasConfigRobot.txt";
