@@ -54,9 +54,8 @@ namespace ConsoleApp1
             /// las otras 2 variables se van hasta el system al ser ejecutadas desde el exe, en cambio 
             /// el current domain base directory se queda con toda la ruta
             ///
-
-
-
+            
+            
             string pathALaIniciativa = SubstringExtensions.Before(path1, "Config");
 
             
@@ -80,7 +79,7 @@ namespace ConsoleApp1
                 }
 
 
-
+            
 
 
 
@@ -91,18 +90,26 @@ namespace ConsoleApp1
             var excel = new ExcelQueryFactory(pathToExcelFile);
             excel.AddMapping("MSISDN", "MSISDN");
             excel.AddMapping("FECHA_ESTATUS", "FECHA_ESTATUS");
-            var query1 = from a in excel.Worksheet<numerosIVRSms>("Detalle") select a;
+            var query1 = from a in excel.Worksheet<numerosIVRSms>("Detalle")
+                         //where a != null
+                         select a;
 
             //string fechaComparacion = DateTime.Today.AddDays(-25).ToShortDateString();
             string fechaComparacion = DateTime.Today.AddDays(-1).ToShortDateString();
 
             foreach (var registro in query1)
             {
-                registro.FECHA_ESTATUS = DateTime.Parse(registro.FECHA_ESTATUS).ToShortDateString();
+                if (registro.FECHA_ESTATUS != null)
+                    registro.FECHA_ESTATUS = DateTime.Parse(registro.FECHA_ESTATUS).ToShortDateString();
+                
+                    
                 //Console.WriteLine("MSISDN: " + registro.MSISDN + "\tFECHA: " + registro.FECHA_ESTATUS + "Tipo fecha: " + registro.FECHA_ESTATUS.GetType());
                 //Console.WriteLine(registro.FECHA_ESTATUS + " " + registro.FECHA_ESTATUS.GetType() + "   " + fechaComparacion.Equals(registro.FECHA_ESTATUS));
 
             }
+
+
+
             //Console.ReadLine();
             //Filename.Replace("\"", "\\");
             //Console.WriteLine(query1.Count());
