@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LinqToExcel;
+using Microsoft.Office.Interop.Excel;
 
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ConsoleApp1
 {
@@ -14,29 +16,7 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-/// 
-           //Probando Branch (¬w¬)~
-            //string path = AppDomain.CurrentDomain.BaseDirectory;
-            //Console.WriteLine("PATH:    " + path);
 
-
-            //Console.WriteLine(path);
-
-
-            //string[] rutasDeEntrada = File.ReadAllLines(path);
-
-            //foreach (var item in rutasDeEntrada)
-            //{
-            //    //item.Replace("\"", "\\");
-            //    //Console.WriteLine(item);
-            //}
-
-
-            //string pathToExcelFile = rutasDeEntrada[0];
-
-            //Console.WriteLine("Path To Excel File: " + pathToExcelFile);
-
-            ///
 
             string path1 = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -54,7 +34,6 @@ namespace ConsoleApp1
             /// las otras 2 variables se van hasta el system al ser ejecutadas desde el exe, en cambio 
             /// el current domain base directory se queda con toda la ruta
             ///
-            
             
             string pathALaIniciativa = SubstringExtensions.Before(path1, "Config");
 
@@ -79,22 +58,33 @@ namespace ConsoleApp1
                 }
 
 
-            
-
 
 
             string pathToExcelFile = lineas[0];
-            
-            
+
+
+            //Se crea una instancia de una aplicación de Excel
+            Excel.Application myExcel = new Excel.Application();
+            //False para que no abra la aplicación, sino que lo haga "por atrás"
+            myExcel.Visible = false;
+            //Aquí usando la instancia de Aplicación de excel, abro el libro mandando como parámetro la ruta a mi archivo
+            Excel.Workbook workbook = myExcel.Workbooks.Open(lineas[0]);
+            //Después uso una instancia de Worksheet (clase de Interop) para obtener la Hoja actual del archivo Excel
+            Worksheet worksheet = myExcel.ActiveSheet;
+            //En ese worksheet, en la propiedad de Name, tenemos el nombre de la hoja actual, que mando en el query 1 como parámetro
+            Console.WriteLine("WorkSheet.Name: " + worksheet.Name);
+
 
             var excel = new ExcelQueryFactory(pathToExcelFile);
             excel.AddMapping("MSISDN", "MSISDN");
             excel.AddMapping("FECHA_ESTATUS", "FECHA_ESTATUS");
-            var query1 = from a in excel.Worksheet<numerosIVRSms>("Detalle")
-                         //where a != null
+            var query1 = from a in excel.Worksheet<numerosIVRSms>(worksheet.Name)
+                             //where a != null
                          select a;
+            //Pensé que esta línea ayudaría al performance pero no ¬¬, tarda lo mismo
+            //select new numerosIVRSms {MSISDN =  a.MSISDN, FECHA_ESTATUS = a.FECHA_ESTATUS };
+            
 
-            //string fechaComparacion = DateTime.Today.AddDays(-25).ToShortDateString();
             string fechaComparacion = DateTime.Today.AddDays(-1).ToShortDateString();
 
             foreach (var registro in query1)
@@ -111,6 +101,7 @@ namespace ConsoleApp1
 
 
             //Console.ReadLine();
+            //Al principio usé el @ para el nombre del archivo, en caso de necesitar recibirlo así sin más podemos usar las líneas de abajo
             //Filename.Replace("\"", "\\");
             //Console.WriteLine(query1.Count());
 
@@ -131,44 +122,6 @@ namespace ConsoleApp1
             //{
             //    Console.WriteLine("MDN: " + filtered.MSISDN + "\tFecha: " + filtered.FECHA_ESTATUS);
             //}
-
-
-
-            ///Este IF me valida que haya números con la especificacion dada (-1, -5, -9), en caso de no haber numeros que tengan esa especificacion 
-            ///no hará nada
-            //if (filteredQuery.Count() == 0)
-            //{
-            //    Console.WriteLine("vacia");
-            //}
-            //else
-            //{
-            //    foreach (var filtered in filteredQuery)
-            //    {
-            //        Console.WriteLine("MDN: " + filtered.MSISDN + "\tFecha: " + filtered.FECHA_ESTATUS);
-            //    }
-
-            //}
-
-            //if (DateTime.Today.DayOfWeek == DayOfWeek.Monday)
-            //{
-            //    Console.WriteLine("Hoy es lunes ¬¬ ");
-
-            //    try
-            //    {
-            //        StreamWriter sw = new StreamWriter(@"C:\Users\numerosLunes.txt", false);
-            //        foreach (var item in filteredQuery)
-            //        {
-            //            sw.WriteLine(item.MSISDN);
-            //        }
-            //        sw.Close();
-            //    }
-            //    catch (Exception e)
-            //    {
-
-            //    }
-            //}
-
-
 
 
             string diaActual = DateTime.Today.DayOfWeek.ToString();
