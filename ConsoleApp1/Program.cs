@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using LinqToExcel;
+using Microsoft.Office.Interop.Excel;
 
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ConsoleApp1
 {
@@ -14,29 +17,7 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-///
 
-            //string path = AppDomain.CurrentDomain.BaseDirectory;
-            //Console.WriteLine("PATH:    " + path);
-
-
-            //Console.WriteLine(path);
-
-
-            //string[] rutasDeEntrada = File.ReadAllLines(path);
-
-            //foreach (var item in rutasDeEntrada)
-            //{
-            //    //item.Replace("\"", "\\");
-            //    //Console.WriteLine(item);
-            //}
-
-
-            //string pathToExcelFile = rutasDeEntrada[0];
-
-            //Console.WriteLine("Path To Excel File: " + pathToExcelFile);
-
-            ///
 
             string path1 = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -55,17 +36,17 @@ namespace ConsoleApp1
             /// el current domain base directory se queda con toda la ruta
             ///
 
-
-
+            
             string pathALaIniciativa = SubstringExtensions.Before(path1, "Config");
 
             
+
             Console.WriteLine("Path a la iniciativa:" + pathALaIniciativa);
 
             string pathAArchivoRutas = pathALaIniciativa + @"Config\rutasConfigRobot.txt";
 
             Console.WriteLine("PATH A ARCHIVO RUTAS: " + pathAArchivoRutas);
-
+            
 
             string fichero = pathAArchivoRutas;
            
@@ -81,26 +62,60 @@ namespace ConsoleApp1
 
 
 
-
-
             string pathToExcelFile = lineas[0];
+
+
+            //Se crea una instancia de una aplicación de Excel
+            Excel.Application myExcel = new Excel.Application();
+            //False para que no abra la aplicación, sino que lo haga "por atrás"
+            myExcel.Visible = false;
+            //Aquí usando la instancia de Aplicación de excel, abro el libro mandando como parámetro la ruta a mi archivo
+            Excel.Workbook workbook = myExcel.Workbooks.Open(lineas[0]);
+            //Después uso una instancia de Worksheet (clase de Interop) para obtener la Hoja actual del archivo Excel
+            Worksheet worksheet = myExcel.ActiveSheet;
+            //En ese worksheet, en la propiedad de Name, tenemos el nombre de la hoja actual, que mando en el query 1 como parámetro
+            Console.WriteLine("WorkSheet.Name: " + worksheet.Name);
+
+            string hojaExcel = worksheet.Name;
+
+            //Al finalizar tu proceso debes cerrar tu workbook
+
+            workbook.Close();
             
-            
+            //Con esto de Marshal se libera de manera completa el objeto desde Interop Services, si no haces esto
+            //El objeto sigue en memoria, no lo libera C#
+            Marshal.FinalReleaseComObject(worksheet);
+            Marshal.FinalReleaseComObject(workbook);
+            Marshal.FinalReleaseComObject(myExcel);
+
 
             var excel = new ExcelQueryFactory(pathToExcelFile);
-            var query1 = from a in excel.Worksheet<numerosIVRSms>() select a;
+            excel.AddMapping("MSISDN", "MSISDN");
+            excel.AddMapping("FECHA_ESTATUS", "FECHA_ESTATUS");
+            var query1 = from a in excel.Worksheet<numerosIVRSms>(hojaExcel)
+                             //where a != null
+                         select a;
+            //Pensé que esta línea ayudaría al performance pero no ¬¬, tarda lo mismo
+            //select new numerosIVRSms {MSISDN =  a.MSISDN, FECHA_ESTATUS = a.FECHA_ESTATUS };
+            
 
-            //string fechaComparacion = DateTime.Today.AddDays(-25).ToShortDateString();
             string fechaComparacion = DateTime.Today.AddDays(-1).ToShortDateString();
 
             foreach (var registro in query1)
             {
-                registro.FECHA_ESTATUS = DateTime.Parse(registro.FECHA_ESTATUS).ToShortDateString();
+                if (registro.FECHA_ESTATUS != null)
+                    registro.FECHA_ESTATUS = DateTime.Parse(registro.FECHA_ESTATUS).ToShortDateString();
+                
+                    
                 //Console.WriteLine("MSISDN: " + registro.MSISDN + "\tFECHA: " + registro.FECHA_ESTATUS + "Tipo fecha: " + registro.FECHA_ESTATUS.GetType());
                 //Console.WriteLine(registro.FECHA_ESTATUS + " " + registro.FECHA_ESTATUS.GetType() + "   " + fechaComparacion.Equals(registro.FECHA_ESTATUS));
 
             }
+
+
+
             //Console.ReadLine();
+            //Al principio usé el @ para el nombre del archivo, en caso de necesitar recibirlo así sin más podemos usar las líneas de abajo
             //Filename.Replace("\"", "\\");
             //Console.WriteLine(query1.Count());
 
@@ -121,44 +136,6 @@ namespace ConsoleApp1
             //{
             //    Console.WriteLine("MDN: " + filtered.MSISDN + "\tFecha: " + filtered.FECHA_ESTATUS);
             //}
-
-
-
-            ///Este IF me valida que haya números con la especificacion dada (-1, -5, -9), en caso de no haber numeros que tengan esa especificacion 
-            ///no hará nada
-            //if (filteredQuery.Count() == 0)
-            //{
-            //    Console.WriteLine("vacia");
-            //}
-            //else
-            //{
-            //    foreach (var filtered in filteredQuery)
-            //    {
-            //        Console.WriteLine("MDN: " + filtered.MSISDN + "\tFecha: " + filtered.FECHA_ESTATUS);
-            //    }
-
-            //}
-
-            //if (DateTime.Today.DayOfWeek == DayOfWeek.Monday)
-            //{
-            //    Console.WriteLine("Hoy es lunes ¬¬ ");
-
-            //    try
-            //    {
-            //        StreamWriter sw = new StreamWriter(@"C:\Users\numerosLunes.txt", false);
-            //        foreach (var item in filteredQuery)
-            //        {
-            //            sw.WriteLine(item.MSISDN);
-            //        }
-            //        sw.Close();
-            //    }
-            //    catch (Exception e)
-            //    {
-
-            //    }
-            //}
-
-
 
 
             string diaActual = DateTime.Today.DayOfWeek.ToString();
