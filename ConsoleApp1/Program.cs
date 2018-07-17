@@ -36,7 +36,8 @@ namespace ConsoleApp1
             /// el current domain base directory se queda con toda la ruta
             ///
 
-            
+            //TableroDeSeguimiento
+
             string pathALaIniciativa = SubstringExtensions.Before(path1, "Config");
 
             
