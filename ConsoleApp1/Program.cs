@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using LinqToExcel;
@@ -34,6 +35,7 @@ namespace ConsoleApp1
             /// las otras 2 variables se van hasta el system al ser ejecutadas desde el exe, en cambio 
             /// el current domain base directory se queda con toda la ruta
             ///
+
             
             string pathALaIniciativa = SubstringExtensions.Before(path1, "Config");
 
@@ -74,11 +76,23 @@ namespace ConsoleApp1
             //En ese worksheet, en la propiedad de Name, tenemos el nombre de la hoja actual, que mando en el query 1 como parámetro
             Console.WriteLine("WorkSheet.Name: " + worksheet.Name);
 
+            string hojaExcel = worksheet.Name;
+
+            //Al finalizar tu proceso debes cerrar tu workbook
+
+            workbook.Close();
+            
+            //Con esto de Marshal se libera de manera completa el objeto desde Interop Services, si no haces esto
+            //El objeto sigue en memoria, no lo libera C#
+            Marshal.FinalReleaseComObject(worksheet);
+            Marshal.FinalReleaseComObject(workbook);
+            Marshal.FinalReleaseComObject(myExcel);
+
 
             var excel = new ExcelQueryFactory(pathToExcelFile);
             excel.AddMapping("MSISDN", "MSISDN");
             excel.AddMapping("FECHA_ESTATUS", "FECHA_ESTATUS");
-            var query1 = from a in excel.Worksheet<numerosIVRSms>(worksheet.Name)
+            var query1 = from a in excel.Worksheet<numerosIVRSms>(hojaExcel)
                              //where a != null
                          select a;
             //Pensé que esta línea ayudaría al performance pero no ¬¬, tarda lo mismo
