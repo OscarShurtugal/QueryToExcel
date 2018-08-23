@@ -15,6 +15,11 @@ namespace ConsoleApp1
 
     class Program
     {
+        //This variable will hold all the messaged numbers, so we can later get them and write them to an excel file
+        //public static IQueryable<numerosIVRSms> messagedNumbers;
+        
+        public static List<numerosIVRSms> messagedNumbers = new List<numerosIVRSms>();
+
         static void Main(string[] args)
         {
 
@@ -50,8 +55,9 @@ namespace ConsoleApp1
             
 
             string fichero = pathAArchivoRutas;
-           
-            
+
+
+            fichero = @"C:\Users\oscarsanchez2\Documents\Automation Anywhere Files\Automation Anywhere\My Tasks\ATT_PRODUCTIVO\IVRMarketing\Config\rutasConfigRobot.txt";
 
             string[] lineas = File.ReadAllLines(fichero);
 
@@ -126,6 +132,8 @@ namespace ConsoleApp1
             var filteredQuery = from a in query1
                                 where (a.FECHA_ESTATUS.Contains(fechaComparacion))
                                 select a;
+
+
 
 
             //var filteredSQL = query1.Where(a => a.FECHA_ESTATUS.ToString() == fechaComparacion.ToString());
@@ -310,11 +318,52 @@ namespace ConsoleApp1
                     break;
             }
 
+            //el procedimiento será el siguiente: Adicional al proceso ya hecho, se agregará a una lista los elementos y el mensaje, y después se hará un contraste de la misma para escribir un excel 
 
-            //Nuevo branch
-           
+            int count = 0;
 
+            foreach (var numeroQueryOriginal in query1)
+            {
+                if (numeroQueryOriginal.MSISDN != null )
+                {
+                    var encontrado = from a in messagedNumbers
+                                     where (a.MSISDN.ToString().Contains(numeroQueryOriginal.MSISDN.ToString()))
+                                     select a;
+                    if (encontrado.Count() > 0)
+                    {
+                        //Console.WriteLine("Lo encontre we, a este numero: " + numeroQueryOriginal.MSISDN);
+                        //Console.WriteLine(numeroQueryOriginal.MSISDN);
+                        //Escribimos en el archivo Excel los datos que contiene el encontrado. AKA mensaje Enviado, con fecha mensaje de HOY
+
+                        foreach (var numeroIdentificado in encontrado)
+                        {
+                            Console.WriteLine("Lo encontré we, a este número: "+ numeroQueryOriginal.MSISDN +" Con fecha estatus: " +numeroIdentificado.FECHA_ESTATUS+  " Se le envió el mensaje: " + numeroIdentificado.MENSAJE_ENVIADO + " el día: " + numeroIdentificado.FECHA_MENSAJE);
+                            
+                        }
+                    }
+                    else
+                    {
+                        //Escribimos en el archivo Excel el numero query original SIN mensaje enviado, con la fecha de hoy
+                        Console.WriteLine("No lo encontré we, no se le enviaron mensajes a este numero: " + numeroQueryOriginal.MSISDN +" que ´tiene fecha estatus: " + numeroQueryOriginal.FECHA_ESTATUS);
+
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Era Basura del Excel We (╯°□°)╯︵ ┻━┻");
+                    Console.WriteLine(numeroQueryOriginal.MSISDN);
+                    Console.WriteLine(numeroQueryOriginal.FECHA_ESTATUS);
+                    
+                }
+                count++;
+                Console.WriteLine("Transaccion: "+count);
+
+            }
+
+            Console.ReadLine();
         }
+                    
+        
 
         private static IQueryable<numerosIVRSms> filterQuery(IQueryable<numerosIVRSms> query1, string dateToCompare)
         {
@@ -341,7 +390,29 @@ namespace ConsoleApp1
                         //Console.WriteLine(item.MSISDN);
                     }
                     sw.Close();
+
+                    foreach (var item in filteredQuery)
+                    {
+                        if (appendedToFile.Contains("First"))
+                        {
+                            messagedNumbers.Add(new numerosIVRSms(item.MSISDN,item.FECHA_ESTATUS,DateTime.Today.ToString(),"1"));   
+                        }else if (appendedToFile.Contains("Second"))
+                        {
+                            messagedNumbers.Add(new numerosIVRSms(item.MSISDN, item.FECHA_ESTATUS, DateTime.Today.ToString(), "2"));
+
+                        }
+                        else if (appendedToFile.Contains("Third"))
+                        {
+                            messagedNumbers.Add(new numerosIVRSms(item.MSISDN, item.FECHA_ESTATUS, DateTime.Today.ToString(), "3"));
+
+                        }
+                    }
+
+
                 }
+
+                
+
                 catch (Exception e)
                 {
 
@@ -372,6 +443,27 @@ namespace ConsoleApp1
     {
         public string MSISDN { get; set; }
         public string FECHA_ESTATUS { get; set; }
+        public string FECHA_MENSAJE { get; set; }
+        public string MENSAJE_ENVIADO { get; set; }
+
+        public numerosIVRSms()
+        {
+
+        }
+
+        public numerosIVRSms(string MSISDN,string FECHA_ESTATUS,string FECHA_MENSAJE, string MENSAJE_ENVIADO)
+        {
+            this.FECHA_ESTATUS = FECHA_ESTATUS;
+            this.FECHA_MENSAJE = FECHA_MENSAJE;
+            this.MSISDN = MSISDN;
+            this.MENSAJE_ENVIADO = MENSAJE_ENVIADO;
+        }
+
+        public numerosIVRSms(string MSISDN, string FECHA_ESTATUS)
+        {
+            this.MSISDN = MSISDN;
+            this.FECHA_ESTATUS = FECHA_ESTATUS;
+        }
     }
 
     public class Product
