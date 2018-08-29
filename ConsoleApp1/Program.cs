@@ -320,10 +320,43 @@ namespace ConsoleApp1
 
             //el procedimiento será el siguiente: Adicional al proceso ya hecho, se agregará a una lista los elementos y el mensaje, y después se hará un contraste de la misma para escribir un excel 
 
-            int count = 0;
+
+            //Se crea una instancia de una aplicación de Excel
+            Microsoft.Office.Interop.Excel.Application excelDeSalida = new Microsoft.Office.Interop.Excel.Application();
+            //False para que no abra la aplicación, sino que lo haga "por atrás"
+            excelDeSalida.Visible = false;
+
+
+            //Aquí usando la instancia de Aplicación de excel, abro el libro mandando como parámetro la ruta a mi archivo
+            Microsoft.Office.Interop.Excel.Workbook workbookDelExcelDeSalida = excelDeSalida.Workbooks.Add(Type.Missing);
+            //Después uso una instancia de Worksheet (clase de Interop) para obtener la Hoja actual del archivo Excel
+            Worksheet worksheetDelExcelDeSalida = excelDeSalida.ActiveSheet;
+            //En ese worksheet, en la propiedad de Name, tenemos el nombre de la hoja actual, que mando en el query 1 como parámetro
+
+
+            //Console.WriteLine("WorkSheet.Name: " + worksheet.Name);
+
+
+            worksheetDelExcelDeSalida.Activate();
+
+            
+            //fila del excel en el cual escribirá
+            int fila = 1;
+            //columna en la cual escribirá
+            int columna = 1;
+
+            worksheetDelExcelDeSalida.Cells[fila, columna] = "MSISDN";
+            columna++;
+            worksheetDelExcelDeSalida.Cells[fila, columna] = "FECHA_ESTATUS";
+            columna++;
+            worksheetDelExcelDeSalida.Cells[fila, columna] = "FECHA_MENSAJE";
+            columna++;
+            worksheetDelExcelDeSalida.Cells[fila, columna] = "MENSAJE_ENVIADO";
+            fila++;
 
             foreach (var numeroQueryOriginal in query1)
             {
+                columna = 1;
                 if (numeroQueryOriginal.MSISDN != null )
                 {
                     var encontrado = from a in messagedNumbers
@@ -338,13 +371,23 @@ namespace ConsoleApp1
                         foreach (var numeroIdentificado in encontrado)
                         {
                             Console.WriteLine("Lo encontré we, a este número: "+ numeroQueryOriginal.MSISDN +" Con fecha estatus: " +numeroIdentificado.FECHA_ESTATUS+  " Se le envió el mensaje: " + numeroIdentificado.MENSAJE_ENVIADO + " el día: " + numeroIdentificado.FECHA_MENSAJE);
-                            
+                            worksheetDelExcelDeSalida.Cells[fila, columna] = numeroIdentificado.MSISDN.ToString();
+                            columna++;
+                            worksheetDelExcelDeSalida.Cells[fila, columna] = numeroIdentificado.FECHA_ESTATUS.ToString();
+                            columna++;
+                            worksheetDelExcelDeSalida.Cells[fila, columna] = numeroIdentificado.FECHA_MENSAJE.ToString();
+                            columna++;
+                            worksheetDelExcelDeSalida.Cells[fila, columna] = numeroIdentificado.MENSAJE_ENVIADO.ToString();
                         }
                     }
                     else
                     {
                         //Escribimos en el archivo Excel el numero query original SIN mensaje enviado, con la fecha de hoy
                         Console.WriteLine("No lo encontré we, no se le enviaron mensajes a este numero: " + numeroQueryOriginal.MSISDN +" que ´tiene fecha estatus: " + numeroQueryOriginal.FECHA_ESTATUS);
+                        worksheetDelExcelDeSalida.Cells[fila, columna] = numeroQueryOriginal.MSISDN.ToString();
+                        columna++;
+                        worksheetDelExcelDeSalida.Cells[fila, columna] = numeroQueryOriginal.FECHA_ESTATUS.ToString();
+                        columna++;
 
                     }
                 }
@@ -355,10 +398,14 @@ namespace ConsoleApp1
                     Console.WriteLine(numeroQueryOriginal.FECHA_ESTATUS);
                     
                 }
-                count++;
-                Console.WriteLine("Transaccion: "+count);
+                fila++;
+                //Console.WriteLine("Transaccion: "+count + " de: " + query1.Count());
 
             }
+
+            workbookDelExcelDeSalida.SaveAs(@"\\C:\Users\oscarsanchez2\Desktop\PruebaExcel\Probando.xlsx");
+
+
 
             Console.ReadLine();
         }
