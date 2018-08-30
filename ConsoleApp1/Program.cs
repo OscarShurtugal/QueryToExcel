@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -401,12 +402,35 @@ namespace ConsoleApp1
                 fila++;
                 //Console.WriteLine("Transaccion: "+count + " de: " + query1.Count());
 
+
+
             }
 
-            workbookDelExcelDeSalida.SaveAs(@"\\C:\Users\oscarsanchez2\Desktop\PruebaExcel\Probando.xlsx");
+            //workbookDelExcelDeSalida.SaveAs(rutaPrincipalAlArchivo + "RelacionDeMensajes" + DateTime.Today.Day + "-" + DateTime.Today.Month + "-" + DateTime.Today.Year + ".xlsx");
+            //workbookDelExcelDeSalida.SaveAs(@"\\C:\Users\oscarsanchez2\Desktop\PruebaExcel\Probando.xlsx");
+            excelDeSalida.DisplayAlerts = false;
+            workbookDelExcelDeSalida.SaveAs(rutaPrincipalAlArchivo + "RelacionDeMensajes.xlsx", Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Excel.XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing);
 
 
 
+            workbookDelExcelDeSalida.Close();
+            excelDeSalida.Quit();
+
+            //Con esto de Marshal se libera de manera completa el objeto desde Interop Services, si no haces esto
+            //El objeto sigue en memoria, no lo libera C#
+            Marshal.FinalReleaseComObject(worksheetDelExcelDeSalida);
+            Marshal.FinalReleaseComObject(workbookDelExcelDeSalida);
+            Marshal.FinalReleaseComObject(excelDeSalida);
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+
+
+
+
+            Console.WriteLine("Fin");
+            
             Console.ReadLine();
         }
                     
