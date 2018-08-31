@@ -58,8 +58,7 @@ namespace ConsoleApp1
             string fichero = pathAArchivoRutas;
 
 
-            fichero = @"C:\Users\oscarsanchez2\Documents\Automation Anywhere Files\Automation Anywhere\My Tasks\ATT_PRODUCTIVO\IVRMarketing\Config\rutasConfigRobot.txt";
-
+            
             string[] lineas = File.ReadAllLines(fichero);
 
             foreach (string linea in lineas)
@@ -371,7 +370,7 @@ namespace ConsoleApp1
 
                         foreach (var numeroIdentificado in encontrado)
                         {
-                            //Console.WriteLine("Lo encontré we, a este número: "+ numeroQueryOriginal.MSISDN +" Con fecha estatus: " +numeroIdentificado.FECHA_ESTATUS+  " Se le envió el mensaje: " + numeroIdentificado.MENSAJE_ENVIADO + " el día: " + numeroIdentificado.FECHA_MENSAJE);
+                            Console.WriteLine("Lo encontré, a este número: " + numeroQueryOriginal.MSISDN + " Con fecha estatus: " + numeroIdentificado.FECHA_ESTATUS + " Se le envió el mensaje: " + numeroIdentificado.MENSAJE_ENVIADO + " el día: " + numeroIdentificado.FECHA_MENSAJE);
                             worksheetDelExcelDeSalida.Cells[fila, columna] = numeroIdentificado.MSISDN.ToString();
                             columna++;
                             worksheetDelExcelDeSalida.Cells[fila, columna] = numeroIdentificado.FECHA_ESTATUS.ToString();
@@ -384,7 +383,7 @@ namespace ConsoleApp1
                     else
                     {
                         //Escribimos en el archivo Excel el numero query original SIN mensaje enviado, con la fecha de hoy
-                        //Console.WriteLine("No lo encontré we, no se le enviaron mensajes a este numero: " + numeroQueryOriginal.MSISDN +" que ´tiene fecha estatus: " + numeroQueryOriginal.FECHA_ESTATUS);
+                        Console.WriteLine("No lo encontré, no se le enviaron mensajes a este numero: " + numeroQueryOriginal.MSISDN + " que ´tiene fecha estatus: " + numeroQueryOriginal.FECHA_ESTATUS);
                         worksheetDelExcelDeSalida.Cells[fila, columna] = numeroQueryOriginal.MSISDN.ToString();
                         columna++;
                         worksheetDelExcelDeSalida.Cells[fila, columna] = numeroQueryOriginal.FECHA_ESTATUS.ToString();
